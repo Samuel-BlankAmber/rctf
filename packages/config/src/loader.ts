@@ -136,6 +136,10 @@ export const loadEnvConfig = (): ConfigLayer => {
     ['ctftime', ctftime],
     ['userMembers', getEnvBoolean('RCTF_USER_MEMBERS')],
     ['hideScoreboardUntilEnd', getEnvBoolean('RCTF_HIDE_SCOREBOARD_UNTIL_END')],
+    [
+      'requireAuthForChallenges',
+      getEnvBoolean('RCTF_REQUIRE_AUTH_FOR_CHALLENGES'),
+    ],
     ['registrationCodes', registrationCodes],
     ['homeContent', getEnvString('RCTF_HOME_CONTENT')],
     ['ctfName', getEnvString('RCTF_NAME')],

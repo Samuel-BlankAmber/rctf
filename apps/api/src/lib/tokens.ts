@@ -13,9 +13,11 @@ export enum TokenKind {
   Team = 1,
   Verify = 2,
   CtftimeAuth = 4,
+  Download = 5,
 }
 
 export type AuthTokenData = string
+export type DownloadTokenData = string
 export type TeamTokenData = string
 
 interface BaseVerifyTokenData {
@@ -43,6 +45,7 @@ export interface TokenDataTypes {
   [TokenKind.Team]: TeamTokenData
   [TokenKind.Verify]: VerifyTokenData
   [TokenKind.CtftimeAuth]: CtftimeAuthTokenData
+  [TokenKind.Download]: DownloadTokenData
 }
 
 export type Token = string
@@ -58,6 +61,7 @@ export const tokenExpiries: Record<TokenKind, number> = {
   [TokenKind.Team]: Infinity,
   [TokenKind.Verify]: Math.floor(config.loginTimeout / 1000),
   [TokenKind.CtftimeAuth]: Math.floor(config.loginTimeout / 1000),
+  [TokenKind.Download]: 24 * 60 * 60,
 }
 
 const timeNow = () => Math.floor(Date.now() / 1000)

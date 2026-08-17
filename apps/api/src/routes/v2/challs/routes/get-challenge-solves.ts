@@ -3,10 +3,15 @@ import { GetChallengeSolvesRouteV2 } from '@rctf/types'
 import { getChallengeSolvesWithPosition } from '../../../../services/challenges'
 import challsGroup from '../group'
 import { scoreboardHidden } from '../../../../services/scoreboard-visibility'
+import { challengesRequireAuth } from '../../../../services/challenge-access'
 
 challsGroup.route(
   GetChallengeSolvesRouteV2,
   async ({ res, ctx, params, query, user }) => {
+    if (challengesRequireAuth() && !user) {
+      return res.badToken()
+    }
+
     if (await scoreboardHidden(ctx, user)) {
       return res.goodChallengeSolvesV2({ solves: [], mySolvePosition: null })
     }

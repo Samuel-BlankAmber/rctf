@@ -168,6 +168,9 @@ export const ServerConfigSchema = z.object({
 
   // Limits
   maxAvatarSize: z._default(z.number(), 1024 * 1024),
+  // Requires a session to read challenges or download their attachments.
+  requireAuthForChallenges: z._default(z.boolean(), false),
+
   // Hides standings and solve counts from players until endTime. Users with
   // the leaderboardRead permission always see the real values.
   hideScoreboardUntilEnd: z._default(z.boolean(), false),

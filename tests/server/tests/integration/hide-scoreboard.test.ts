@@ -65,7 +65,7 @@ describe('hideScoreboardUntilEnd', () => {
     config.hideScoreboardUntilEnd = true
     config.endTime = Date.now() + 60_000
 
-    const challenge = await generateChallenge()
+    const { challenge, cleanup } = await generateChallenge()
     const res = await request(
       app,
       `/api/v1/challs/${challenge.id}/solves?limit=10&offset=0`,
@@ -74,6 +74,7 @@ describe('hideScoreboardUntilEnd', () => {
 
     const body = await expectResponse(res, GoodChallengeSolves)
     expect(body.data.solves).toEqual([])
+    await cleanup()
   })
 
   test('still shows the leaderboard to users who may read it', async () => {

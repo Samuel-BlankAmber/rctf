@@ -66,6 +66,7 @@ The following environment variables are supported. They override values from con
 | `<yellow>RCTF_USER_MEMBERS</yellow>`          | `boolean{:ts}` | Enable team members feature                |
 | `<yellow>RCTF_REGISTRATION_CODES</yellow>`    | `string{:ts}`  | Comma-separated registration codes         |
 | `<yellow>RCTF_HIDE_SCOREBOARD_UNTIL_END</yellow>` | `boolean{:ts}` | Hide standings and solver identities until the end |
+| `<yellow>RCTF_REQUIRE_AUTH_FOR_CHALLENGES</yellow>` | `boolean{:ts}` | Require a session to read challenges |
 | `<yellow>RCTF_CTFTIME_CLIENT_ID</yellow>`     | `string{:ts}`  | CTFtime OAuth client ID                    |
 | `<yellow>RCTF_CTFTIME_CLIENT_SECRET</yellow>` | `string{:ts}`  | CTFtime OAuth client secret                |
 
@@ -443,6 +444,32 @@ analytics:
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
 | `<red>analytics.provider</red>` | `object{:ts}` | - | Analytics provider (`<green>analytics/google</green>`, `<green>analytics/cloudflare</green>`) |
+
+### Requiring a session for challenges
+
+```yaml
+requireAuthForChallenges: true
+```
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `<red>requireAuthForChallenges</red>` | `boolean{:ts}` | `false{:ts}` | Refuses challenge reads and attachment downloads without a session |
+
+rCTF normally serves challenges to anyone once the competition has started. For
+an invite-only event that leaks the whole challenge set, including attachments,
+to people who never registered. With this on, `<route>GET /api/v[12]/challs</route>`,
+the solver lists, and `/uploads/{:dir}` all require a valid token.
+
+Attachments are fetched by ordinary browser navigation, which sends no
+`Authorization{:http}` header, so the challenge list signs each file URL with a
+short-lived download token for the requesting user. Because the list itself is
+gated, an unregistered visitor has no way to obtain one.
+
+:::warning[Local uploads only]
+The download token is enforced by the local upload provider. S3, R2 and GCS
+serve files from the object store, outside rCTF, so their URLs stay reachable to
+anyone holding them.
+:::
 
 ### Hiding the scoreboard
 

@@ -4,6 +4,11 @@ import type { Hono } from 'hono'
 import type { AppEnv } from '../../lib/app-env'
 import type { Csp } from '../base'
 import { encodeKey, UploadProvider, type FileInfo } from './base'
+import {
+  challengesRequireAuth,
+  DOWNLOAD_TOKEN_PARAM,
+  downloadTokenValid,
+} from '../../services/challenge-access'
 
 export default class LocalProvider extends UploadProvider {
   private readonly uploadDirectory: string
@@ -42,6 +47,25 @@ export default class LocalProvider extends UploadProvider {
     // reserved characters (& ; + ...) percent-encoded and breaks lookups for
     // keys produced by encodeKey, so serve files with the exact inverse
     app.get('/uploads/*', async (c, next) => {
+      // Attachments are challenge content, so they are gated with it. The
+      // token travels in the query string because a browser downloading a
+      // link sends no Authorization header.
+      if (challengesRequireAuth()) {
+        const bearer = c.req
+          .header('authorization')
+          ?.match(/^Bearer (.+)$/)?.[1]
+        const supplied = c.req.query(DOWNLOAD_TOKEN_PARAM) ?? bearer
+        if (!(await downloadTokenValid(supplied))) {
+          return c.json(
+            {
+              kind: 'badToken',
+              message: 'The token is invalid or expired.',
+            },
+            401
+          )
+        }
+      }
+
       let file: ReturnType<typeof Bun.file>
       try {
         const key = new URL(c.req.raw.url).pathname

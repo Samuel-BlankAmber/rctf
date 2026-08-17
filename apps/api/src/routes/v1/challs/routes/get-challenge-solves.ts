@@ -6,10 +6,15 @@ import {
 } from '../../../../services/challenges'
 import challsGroup from '../group'
 import { scoreboardHidden } from '../../../../services/scoreboard-visibility'
+import { challengesRequireAuth } from '../../../../services/challenge-access'
 
 challsGroup.route(
   GetChallengeSolvesRoute,
   async ({ res, ctx, params, query, user }) => {
+    if (challengesRequireAuth() && !user) {
+      return res.badToken()
+    }
+
     if (await scoreboardHidden(ctx, user)) {
       return res.goodChallengeSolves({ solves: [] })
     }
