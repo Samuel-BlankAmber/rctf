@@ -455,7 +455,8 @@ hideScoreboardUntilEnd: true
 | `<red>hideScoreboardUntilEnd</red>` | `boolean{:ts}` | `false{:ts}` | Withholds standings and solver identities from participants until `<red>endTime</red>` |
 
 With this on, the leaderboard reads empty, a challenge's solve list is empty,
-and profiles show no score, rank or solves. Solve counts stay visible on each
+and profiles show no score, rank or solves. Participants keep their own score
+and solve history but not their own rank, since a rank is the scoreboard. Solve counts stay visible on each
 challenge, so participants can still tell which challenges are proving hard.
 Users holding the `leaderboardRead` permission always see the real values, so
 organisers can run the event normally.

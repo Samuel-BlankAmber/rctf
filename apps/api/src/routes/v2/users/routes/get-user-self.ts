@@ -3,6 +3,7 @@ import { createToken, TokenKind } from '../../../../lib/tokens'
 import { getFullUser } from '../../../../services/full-user'
 import { allowedDivisions } from '../../../../util/acl'
 import usersGroup from '../group'
+import { scoreboardHidden } from '../../../../services/scoreboard-visibility'
 
 usersGroup.route(GetUserSelfRouteV2, async ({ ctx, user, res }) => {
   const [fullUser, teamToken] = await Promise.all([
@@ -14,8 +15,12 @@ usersGroup.route(GetUserSelfRouteV2, async ({ ctx, user, res }) => {
     defaultOnly: false,
   }) as string[]
 
+  // Their own score and solves are theirs to see; their rank is the scoreboard.
+  const hidden = await scoreboardHidden(ctx, user)
+
   return res.goodUserSelfDataV2({
     ...fullUser,
+    ...(hidden ? { globalPlace: null, divisionPlace: null } : {}),
     teamToken: teamToken,
     allowedDivisions: allowedDivs,
     perms: user.perms,

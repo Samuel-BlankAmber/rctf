@@ -3,6 +3,7 @@ import {
   GoodChallenges,
   GoodChallengeSolves,
   GoodLeaderboard,
+  GoodUserSelfData,
   Permissions,
 } from '@rctf/types'
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
@@ -94,6 +95,24 @@ describe('hideScoreboardUntilEnd', () => {
     const body = await expectResponse(res, GoodLeaderboard)
     expect(body.data.total).toBeGreaterThanOrEqual(0)
     expect(Array.isArray(body.data.leaderboard)).toBe(true)
+  })
+
+  test('withholds a player their own rank while the CTF runs', async () => {
+    config.hideScoreboardUntilEnd = true
+    config.endTime = Date.now() + 60_000
+
+    const player = await generateRealTestUser()
+    const res = await request(app, '/api/v1/users/me', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${await generateAuthToken(player.user.id)}`,
+      },
+    })
+
+    const body = await expectResponse(res, GoodUserSelfData)
+    expect(body.data.globalPlace).toBeNull()
+    expect(body.data.divisionPlace).toBeNull()
+    expect(Array.isArray(body.data.solves)).toBe(true)
   })
 
   test('reveals the scoreboard once the CTF has ended', async () => {
