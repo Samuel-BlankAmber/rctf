@@ -127,6 +127,7 @@ export const loadEnvConfig = (): ConfigLayer => {
     ['origin', getEnvString('RCTF_ORIGIN')],
     ['ctftime', ctftime],
     ['userMembers', getEnvBoolean('RCTF_USER_MEMBERS')],
+    ['hideScoreboardUntilEnd', getEnvBoolean('RCTF_HIDE_SCOREBOARD_UNTIL_END')],
     ['homeContent', getEnvString('RCTF_HOME_CONTENT')],
     ['ctfName', getEnvString('RCTF_NAME')],
     ['meta', meta],

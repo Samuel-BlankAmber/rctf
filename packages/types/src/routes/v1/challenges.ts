@@ -63,6 +63,7 @@ export const GetChallengeSolvesRoute = defineRoute({
   goodResponses: [GoodChallengeSolves],
   badResponses: [BadNotStarted, BadChallenge, BadBody],
   authRequired: false,
+  optionalAuth: true,
   params: z.object({
     id: z.string().check(z.describe('Challenge ID.')),
   }),

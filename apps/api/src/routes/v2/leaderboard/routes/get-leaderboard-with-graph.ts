@@ -4,14 +4,24 @@ import { getGraphForEntries } from '../../../../cache/leaderboard'
 import { getLeaderboardWithFilters } from '../../../../services/leaderboard-queries'
 import { rateLimitSearch } from '../../../../services/rate-limit'
 import leaderboardGroup from '../group'
+import { scoreboardHidden } from '../../../../services/scoreboard-visibility'
 
 leaderboardGroup.route(
   GetLeaderboardWithGraphRoute,
   async ({
     ctx,
     res,
+    user,
     query: { limit, offset, division, search, challenge },
   }) => {
+    if (await scoreboardHidden(ctx, user)) {
+      return res.goodLeaderboardWithGraph({
+        graph: [],
+        total: 0,
+        leaderboard: [],
+      })
+    }
+
     // NOTE: Handling manually because the value is loaded from config
     if (
       limit > config.leaderboard.graphWithListLimit ||

@@ -5,10 +5,15 @@ import {
   getChallengeSolves,
 } from '../../../../services/challenges'
 import challsGroup from '../group'
+import { scoreboardHidden } from '../../../../services/scoreboard-visibility'
 
 challsGroup.route(
   GetChallengeSolvesRoute,
-  async ({ res, ctx, params, query }) => {
+  async ({ res, ctx, params, query, user }) => {
+    if (await scoreboardHidden(ctx, user)) {
+      return res.goodChallengeSolves({ solves: [] })
+    }
+
     // NOTE: Handling manually because the values are loaded from config
     if (
       query.limit > config.leaderboard.maxLimit ||

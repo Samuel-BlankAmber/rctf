@@ -7,6 +7,7 @@ import {
   scoringKindOf,
 } from '../../../../services/challenge-queries'
 import leaderboardGroup from '../group'
+import { scoreboardHidden } from '../../../../services/scoreboard-visibility'
 
 const preparedLeaderboardChallenges = preparedPerDb(db =>
   db
@@ -38,7 +39,11 @@ const preparedLeaderboardChallenges = preparedPerDb(db =>
 
 leaderboardGroup.route(
   GetLeaderboardChallengesRouteV2,
-  async ({ ctx, res }) => {
+  async ({ ctx, res, user }) => {
+    if (await scoreboardHidden(ctx, user)) {
+      return res.goodLeaderboardChallengesV2({ challenges: {} })
+    }
+
     const rows = await preparedLeaderboardChallenges(ctx.var.db).execute()
 
     return res.goodLeaderboardChallengesV2({

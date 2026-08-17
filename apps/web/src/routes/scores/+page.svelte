@@ -30,6 +30,11 @@
 
   const endTime = $derived(configQuery.data?.endTime ?? null)
 
+  const scoreboardHidden = $derived(
+    configQuery.data?.hideScoreboardUntilEnd === true &&
+      Date.now() < (endTime ?? 0)
+  )
+
   let screenshotOpen = $state(false)
 
   const focusFetching = $derived(
@@ -47,6 +52,14 @@
 
 {#if data.isNotStarted}
   <CtfNotStarted />
+{:else if scoreboardHidden}
+  <scores-hidden>
+    <EmptyState
+      icon={IconTrophy}
+      title="Scores are hidden"
+      subtitle="Standings are revealed when the competition ends."
+    />
+  </scores-hidden>
 {:else}
   <scores-page>
     <ScoresToolbar
@@ -110,6 +123,14 @@
 {/if}
 
 <style>
+  scores-hidden {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-s);
+  }
+
   scores-page {
     display: flex;
     flex: 1;

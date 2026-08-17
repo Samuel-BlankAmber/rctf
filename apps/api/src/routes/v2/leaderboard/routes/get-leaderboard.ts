@@ -6,10 +6,15 @@ import {
 } from '../../../../services/leaderboard-queries'
 import { rateLimitSearch } from '../../../../services/rate-limit'
 import leaderboardGroup from '../group'
+import { scoreboardHidden } from '../../../../services/scoreboard-visibility'
 
 leaderboardGroup.route(
   GetLeaderboardRouteV2,
-  async ({ ctx, res, query: { limit, offset, division, search } }) => {
+  async ({ ctx, res, user, query: { limit, offset, division, search } }) => {
+    if (await scoreboardHidden(ctx, user)) {
+      return res.goodLeaderboardV2({ total: 0, leaderboard: [] })
+    }
+
     if (
       limit > config.leaderboard.maxLimit ||
       offset > config.leaderboard.maxOffset

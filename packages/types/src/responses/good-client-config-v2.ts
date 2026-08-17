@@ -51,6 +51,11 @@ export const GoodClientConfigV2 = response('goodClientConfigV2', {
     endTime: example(z.int(), 1710864000000).check(
       z.describe('CTF end time as a Unix timestamp in milliseconds.')
     ),
+    hideScoreboardUntilEnd: example(z.boolean(), false).check(
+      z.describe(
+        'Whether standings and solve counts are hidden until the CTF ends.'
+      )
+    ),
     userMembers: example(z.boolean(), true).check(
       z.describe('Whether teams may add individual members.')
     ),

@@ -64,6 +64,7 @@ The following environment variables are supported. They override values from con
 | `<yellow>RCTF_END_TIME</yellow>`              | `integer{:ts}` | Competition end time (Unix milliseconds)   |
 | `<yellow>RCTF_LOGIN_TIMEOUT</yellow>`         | `integer{:ts}` | Verification token expiry in milliseconds  |
 | `<yellow>RCTF_USER_MEMBERS</yellow>`          | `boolean{:ts}` | Enable team members feature                |
+| `<yellow>RCTF_HIDE_SCOREBOARD_UNTIL_END</yellow>` | `boolean{:ts}` | Hide standings and solver identities until the end |
 | `<yellow>RCTF_CTFTIME_CLIENT_ID</yellow>`     | `string{:ts}`  | CTFtime OAuth client ID                    |
 | `<yellow>RCTF_CTFTIME_CLIENT_SECRET</yellow>` | `string{:ts}`  | CTFtime OAuth client secret                |
 
@@ -420,6 +421,26 @@ analytics:
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
 | `<red>analytics.provider</red>` | `object{:ts}` | - | Analytics provider (`<green>analytics/google</green>`, `<green>analytics/cloudflare</green>`) |
+
+### Hiding the scoreboard
+
+```yaml
+hideScoreboardUntilEnd: true
+```
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `<red>hideScoreboardUntilEnd</red>` | `boolean{:ts}` | `false{:ts}` | Withholds standings and solver identities from participants until `<red>endTime</red>` |
+
+With this on, the leaderboard reads empty, a challenge's solve list is empty,
+and profiles show no score, rank or solves. Solve counts stay visible on each
+challenge, so participants can still tell which challenges are proving hard.
+Users holding the `leaderboardRead` permission always see the real values, so
+organisers can run the event normally.
+
+This hides the scoreboard rather than freezing it: everything appears at once
+when the competition ends. Scoring is unaffected, so solves still count and the
+standings are correct the moment they are revealed.
 
 ### Limits
 

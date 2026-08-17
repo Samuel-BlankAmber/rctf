@@ -166,6 +166,10 @@ export const ServerConfigSchema = z.object({
 
   // Limits
   maxAvatarSize: z._default(z.number(), 1024 * 1024),
+  // Hides standings and solve counts from players until endTime. Users with
+  // the leaderboardRead permission always see the real values.
+  hideScoreboardUntilEnd: z._default(z.boolean(), false),
+
   leaderboard: z.prefault(
     z.object({
       maxLimit: z._default(z.number(), 100),

@@ -28,6 +28,7 @@ integrationsGroup.route(GetClientConfigRouteV2, async ({ res, ctx }) => {
     defaultDivision: config.defaultDivision ?? null,
     origin: config.origin,
     userMembers: config.userMembers,
+    hideScoreboardUntilEnd: config.hideScoreboardUntilEnd,
     emailEnabled: Boolean(config.email),
     analytics: getAnalyticsConfig(),
     registrationsEnabled: config.registrationsEnabled ?? null,

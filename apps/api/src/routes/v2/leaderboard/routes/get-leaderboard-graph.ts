@@ -2,10 +2,15 @@ import { config } from '@rctf/config'
 import { GetLeaderboardGraphRouteV2 } from '@rctf/types'
 import { getGraph } from '../../../../cache/leaderboard'
 import leaderboardGroup from '../group'
+import { scoreboardHidden } from '../../../../services/scoreboard-visibility'
 
 leaderboardGroup.route(
   GetLeaderboardGraphRouteV2,
-  async ({ ctx, res, query: { limit, offset, division } }) => {
+  async ({ ctx, res, user, query: { limit, offset, division } }) => {
+    if (await scoreboardHidden(ctx, user)) {
+      return res.goodLeaderboardGraph({ graph: [] })
+    }
+
     // NOTE: Handling manually because the value is loaded from config
     if (
       limit > config.leaderboard.graphMaxTeams ||
