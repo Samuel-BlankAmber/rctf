@@ -8,6 +8,7 @@ import {
 } from '../../../../services/challenge-queries'
 import leaderboardGroup from '../group'
 import { scoreboardHidden } from '../../../../services/scoreboard-visibility'
+import { challengesRequireAuth } from '../../../../services/challenge-access'
 
 const preparedLeaderboardChallenges = preparedPerDb(db =>
   db
@@ -40,6 +41,10 @@ const preparedLeaderboardChallenges = preparedPerDb(db =>
 leaderboardGroup.route(
   GetLeaderboardChallengesRouteV2,
   async ({ ctx, res, user }) => {
+    if (challengesRequireAuth() && !user) {
+      return res.badToken()
+    }
+
     if (await scoreboardHidden(ctx, user)) {
       return res.goodLeaderboardChallengesV2({ challenges: {} })
     }

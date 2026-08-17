@@ -71,7 +71,7 @@ export const GetChallengeScoresRouteV2 = defineRoute({
   path: '/v2/challs/:id/scores',
   method: 'GET',
   goodResponses: [GoodChallengeScoresV2],
-  badResponses: [BadNotStarted, BadChallenge, BadBody],
+  badResponses: [BadNotStarted, BadChallenge, BadBody, BadToken],
   optionalAuth: true,
   params: z.object({
     id: z.string().check(z.describe('Challenge ID.')),

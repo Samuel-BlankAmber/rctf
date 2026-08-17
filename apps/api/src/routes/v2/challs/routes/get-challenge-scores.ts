@@ -5,10 +5,15 @@ import {
   getChallengeScoresWithPosition,
 } from '../../../../services/challenges'
 import challsGroup from '../group'
+import { challengesRequireAuth } from '../../../../services/challenge-access'
 
 challsGroup.route(
   GetChallengeScoresRouteV2,
   async ({ res, ctx, params, query, user }) => {
+    if (challengesRequireAuth() && !user) {
+      return res.badToken()
+    }
+
     // NOTE: Handling manually because the values are loaded from config
     if (
       query.limit > config.leaderboard.maxLimit ||

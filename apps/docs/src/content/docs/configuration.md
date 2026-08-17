@@ -457,8 +457,9 @@ requireAuthForChallenges: true
 
 rCTF normally serves challenges to anyone once the competition has started. For
 an invite-only event that leaks the whole challenge set, including attachments,
-to people who never registered. With this on, `<route>GET /api/v[12]/challs</route>`,
-the solver lists, and `/uploads/{:dir}` all require a valid token.
+to people who never registered. With this on, `<route>GET /api/v[12]/challs</route>`, the solver lists, the
+per-challenge scores, the leaderboard's challenge index (which carries every
+challenge name and category) and `/uploads/{:dir}` all require a valid token.
 
 Attachments are fetched by ordinary browser navigation, which sends no
 `Authorization{:http}` header, so the challenge list signs each file URL with a

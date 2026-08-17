@@ -66,6 +66,32 @@ describe('requireAuthForChallenges', () => {
     await cleanup()
   })
 
+  test('the leaderboard challenge index is refused without a session', async () => {
+    // It carries every challenge name and category, so it is challenge data
+    // regardless of living under the leaderboard routes.
+    config.requireAuthForChallenges = true
+
+    const res = await request(app, '/api/v2/leaderboard/challs', {
+      method: 'GET',
+    })
+
+    await expectResponse(res, BadToken)
+  })
+
+  test('challenge scores are refused without a session', async () => {
+    config.requireAuthForChallenges = true
+
+    const { challenge, cleanup } = await generateChallenge()
+    const res = await request(
+      app,
+      `/api/v2/challs/${challenge.id}/scores?limit=10&offset=0`,
+      { method: 'GET' }
+    )
+
+    await expectResponse(res, BadToken)
+    await cleanup()
+  })
+
   test('a registered player still sees challenges', async () => {
     config.requireAuthForChallenges = true
 
