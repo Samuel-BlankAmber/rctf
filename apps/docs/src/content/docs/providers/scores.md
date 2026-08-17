@@ -281,6 +281,62 @@ scoreProvider:
 ```
 
 :::
+:::tab[scores/linear]
+
+<figure style="margin:1.5rem 0;overflow:hidden;background:var(--background-l1);border-radius:var(--radius-lg)">
+<svg viewBox="0 0 720 360" role="img" style="display:block;width:100%"><line x1="58" x2="696" y1="304" y2="304" stroke="var(--border)" stroke-width="1"/>
+<text x="46" y="308" text-anchor="end" fill="var(--muted-foreground)" font-size="11">0</text>
+<line x1="58" x2="696" y1="248.8" y2="248.8" stroke="var(--border)" stroke-width="1"/>
+<text x="46" y="252.8" text-anchor="end" fill="var(--muted-foreground)" font-size="11">100</text>
+<line x1="58" x2="696" y1="193.6" y2="193.6" stroke="var(--border)" stroke-width="1"/>
+<text x="46" y="197.6" text-anchor="end" fill="var(--muted-foreground)" font-size="11">200</text>
+<line x1="58" x2="696" y1="138.4" y2="138.4" stroke="var(--border)" stroke-width="1"/>
+<text x="46" y="142.4" text-anchor="end" fill="var(--muted-foreground)" font-size="11">300</text>
+<line x1="58" x2="696" y1="83.19999999999999" y2="83.19999999999999" stroke="var(--border)" stroke-width="1"/>
+<text x="46" y="87.19999999999999" text-anchor="end" fill="var(--muted-foreground)" font-size="11">400</text>
+<line x1="58" x2="696" y1="28" y2="28" stroke="var(--border)" stroke-width="1"/>
+<text x="46" y="32" text-anchor="end" fill="var(--muted-foreground)" font-size="11">500</text>
+<line x1="58" x2="58" y1="28" y2="304" stroke="var(--border)" stroke-opacity="0.5" stroke-width="1"/>
+<text x="58" y="326" text-anchor="middle" fill="var(--muted-foreground)" font-size="11">0</text>
+<line x1="185.60000000000002" x2="185.60000000000002" y1="28" y2="304" stroke="var(--border)" stroke-opacity="0.5" stroke-width="1"/>
+<text x="185.60000000000002" y="326" text-anchor="middle" fill="var(--muted-foreground)" font-size="11">10</text>
+<line x1="313.20000000000005" x2="313.20000000000005" y1="28" y2="304" stroke="var(--border)" stroke-opacity="0.5" stroke-width="1"/>
+<text x="313.20000000000005" y="326" text-anchor="middle" fill="var(--muted-foreground)" font-size="11">20</text>
+<line x1="440.8" x2="440.8" y1="28" y2="304" stroke="var(--border)" stroke-opacity="0.5" stroke-width="1"/>
+<text x="440.8" y="326" text-anchor="middle" fill="var(--muted-foreground)" font-size="11">30</text>
+<line x1="568.4000000000001" x2="568.4000000000001" y1="28" y2="304" stroke="var(--border)" stroke-opacity="0.5" stroke-width="1"/>
+<text x="568.4000000000001" y="326" text-anchor="middle" fill="var(--muted-foreground)" font-size="11">40</text>
+<line x1="696" x2="696" y1="28" y2="304" stroke="var(--border)" stroke-opacity="0.5" stroke-width="1"/>
+<text x="696" y="326" text-anchor="middle" fill="var(--muted-foreground)" font-size="11">50</text>
+<line x1="58" x2="58" y1="28" y2="304" stroke="var(--foreground)" stroke-width="1.5"/>
+<line x1="58" x2="696" y1="304" y2="304" stroke="var(--foreground)" stroke-width="1.5"/>
+<polyline points="58.00,28.00 70.76,28.00 83.52,83.20 96.28,138.40 109.04,193.60 121.80,248.80 134.56,248.80 147.32,248.80 160.08,248.80 172.84,248.80 185.60,248.80 198.36,248.80 211.12,248.80 223.88,248.80 236.64,248.80 249.40,248.80 262.16,248.80 274.92,248.80 287.68,248.80 300.44,248.80 313.20,248.80 325.96,248.80 338.72,248.80 351.48,248.80 364.24,248.80 377.00,248.80 389.76,248.80 402.52,248.80 415.28,248.80 428.04,248.80 440.80,248.80 453.56,248.80 466.32,248.80 479.08,248.80 491.84,248.80 504.60,248.80 517.36,248.80 530.12,248.80 542.88,248.80 555.64,248.80 568.40,248.80 581.16,248.80 593.92,248.80 606.68,248.80 619.44,248.80 632.20,248.80 644.96,248.80 657.72,248.80 670.48,248.80 683.24,248.80 696.00,248.80" fill="none" stroke="var(--tone-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>
+<figcaption style="display:flex;flex-wrap:wrap;gap:.5rem 1rem;background:var(--background-l2);padding:.75rem 1rem;font-size:.8rem"><span style="display:inline-flex;align-items:center;gap:.5rem;color:var(--foreground)"><span style="display:inline-block;width:.65rem;height:.65rem;border-radius:999px;background:var(--tone-red)"></span>scores/linear, solvesToMinimum 5</span></figcaption>
+</figure>
+
+Straight-line decay that reaches `<red>minPoints</red>` at a chosen solve count and then stays there. The first solver always gets `<red>maxPoints</red>` and every solve after that removes an equal slice, so a challenge's worth is easy to reason about while writing it.
+
+With the default `<red>solvesToMinimum</red>` of `<green>5</green>` on a 100-500 challenge, solvers get 500, 400, 300, 200, then 100 for everyone after.
+
+```yaml
+scoreProvider:
+  name: scores/linear
+  options:
+    solvesToMinimum: 5
+```
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `<red>solvesToMinimum</red>` | `number{:ts}` | `5{:ts}` | Solve count at which a challenge reaches `<red>minPoints</red>`. Values below `2{:ts}` are treated as `2{:ts}` |
+
+::::note
+
+Unlike the logarithmic providers this floors out, so once a challenge reaches `<red>solvesToMinimum</red>` it stops separating solvers. Pick a value below the number of participants you expect to solve it.
+
+::::
+
+:::
+
 :::tab[scores/legacy]
 
 <figure style="margin:1.5rem 0;overflow:hidden;background:var(--background-l1);border-radius:var(--radius-lg)">
