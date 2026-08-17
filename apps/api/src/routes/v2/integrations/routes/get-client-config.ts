@@ -4,6 +4,7 @@ import { captchaProvider } from '../../../../providers/instances/captcha'
 import { instancerEnabled } from '../../../../providers/instances/instancer'
 import { getResolvedSettings } from '../../../../services/settings'
 import integrationsGroup from '../group'
+import { registrationCodeRequired } from '../../../../services/registration-codes'
 
 const getAnalyticsConfig = () => {
   if (config.analytics?.provider) {
@@ -29,6 +30,7 @@ integrationsGroup.route(GetClientConfigRouteV2, async ({ res, ctx }) => {
     origin: config.origin,
     userMembers: config.userMembers,
     hideScoreboardUntilEnd: config.hideScoreboardUntilEnd,
+    registrationCodeRequired: registrationCodeRequired(),
     emailEnabled: Boolean(config.email),
     analytics: getAnalyticsConfig(),
     registrationsEnabled: config.registrationsEnabled ?? null,

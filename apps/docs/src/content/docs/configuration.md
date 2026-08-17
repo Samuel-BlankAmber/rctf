@@ -64,6 +64,7 @@ The following environment variables are supported. They override values from con
 | `<yellow>RCTF_END_TIME</yellow>`              | `integer{:ts}` | Competition end time (Unix milliseconds)   |
 | `<yellow>RCTF_LOGIN_TIMEOUT</yellow>`         | `integer{:ts}` | Verification token expiry in milliseconds  |
 | `<yellow>RCTF_USER_MEMBERS</yellow>`          | `boolean{:ts}` | Enable team members feature                |
+| `<yellow>RCTF_REGISTRATION_CODES</yellow>`    | `string{:ts}`  | Comma-separated registration codes         |
 | `<yellow>RCTF_HIDE_SCOREBOARD_UNTIL_END</yellow>` | `boolean{:ts}` | Hide standings and solver identities until the end |
 | `<yellow>RCTF_CTFTIME_CLIENT_ID</yellow>`     | `string{:ts}`  | CTFtime OAuth client ID                    |
 | `<yellow>RCTF_CTFTIME_CLIENT_SECRET</yellow>` | `string{:ts}`  | CTFtime OAuth client secret                |
@@ -228,6 +229,9 @@ Division ACLs require an email provider. Disable CTFtime authentication when usi
 
 ```yaml
 registrationsEnabled: true
+registrationCodes:
+  - first-cohort
+  - second-cohort
 userMembers: true
 maxMembers: 50
 loginTimeout: 3600000
@@ -239,6 +243,7 @@ ctftime:
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
 | `<red>registrationsEnabled</red>` | `boolean{:ts}` | `true{:ts}` | Whether new registrations are allowed |
+| `<red>registrationCodes</red>` | `string[]{:ts}` | `[]{:json}` | When non-empty, registering requires one of these codes |
 | `<red>userMembers</red>` | `boolean{:ts}` | `true{:ts}` | Enable team members feature |
 | `<red>maxMembers</red>` | `number{:ts}` | `50{:ts}` | Maximum members per team |
 | `<red>loginTimeout</red>` | `number{:ts}` | `3600000{:ts}` | Verification/CTFtime token expiry in milliseconds (1 hour) |
@@ -247,6 +252,23 @@ ctftime:
 
 :::note
 Auth tokens (used for logging in) never expire. Only verification and CTFtime tokens expire according to `<red>loginTimeout</red>`.
+:::
+
+#### Registration codes
+
+Setting `<red>registrationCodes</red>` closes registration to anyone without a
+code, which suits invite-only events where `<red>registrationsEnabled</red>` is
+too blunt: it is all or nothing, and the email allowlist in
+`<red>divisionACLs</red>` needs a configured email provider.
+
+Any listed code is accepted, so codes can be handed to different groups and
+revoked one at a time by removing them. Codes are compared in constant time, and
+the registration form asks for one whenever the list is non-empty.
+
+:::note[A code is a shared secret]
+Anyone holding a code can register and can pass it on. Rotate the list if one
+leaks, and set `<red>registrationsEnabled</red>` to `false{:ts}` once everyone
+expected has signed up.
 :::
 
 ### Providers

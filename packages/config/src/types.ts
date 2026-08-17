@@ -86,6 +86,8 @@ export const ServerConfigSchema = z.object({
 
   // Auth
   registrationsEnabled: z._default(z.boolean(), true),
+  // When non-empty, registration requires one of these codes.
+  registrationCodes: z._default(z.array(z.string()), []),
   userMembers: z._default(z.boolean(), true),
   maxMembers: z._default(z.number(), 50),
   loginTimeout: z._default(z.number(), 3_600_000),

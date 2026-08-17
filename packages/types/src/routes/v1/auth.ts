@@ -13,6 +13,7 @@ import {
   BadName,
   BadRateLimit,
   BadRecaptchaCode,
+  BadRegistrationCode,
   BadRegistrationsDisabled,
   BadToken,
   BadTokenVerification,
@@ -44,6 +45,9 @@ export const RegisterRoute = defineRoute({
             'Required when `email` is omitted. Only usable when CTFtime auth is configured.'
           )
         ),
+      registrationCode: z
+        .optional(z.string())
+        .check(z.describe('Required when `registrationCodes` is configured.')),
       recaptchaCode: z
         .optional(z.string())
         .check(
@@ -70,6 +74,7 @@ export const RegisterRoute = defineRoute({
     BadKnownCtftimeId,
     BadKnownEmail,
     BadKnownName,
+    BadRegistrationCode,
     BadRegistrationsDisabled,
     BadRecaptchaCode,
     BadEndpoint,

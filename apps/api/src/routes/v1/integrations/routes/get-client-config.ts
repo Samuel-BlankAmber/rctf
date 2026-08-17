@@ -2,6 +2,7 @@ import { config } from '@rctf/config'
 import { GetClientConfigRoute } from '@rctf/types'
 import { getResolvedSettings } from '../../../../services/settings'
 import integrationsGroup from '../group'
+import { registrationCodeRequired } from '../../../../services/registration-codes'
 
 integrationsGroup.route(GetClientConfigRoute, async ({ res, ctx }) => {
   const resolved = await getResolvedSettings(ctx.var.db, ctx.var.redis)
@@ -18,6 +19,7 @@ integrationsGroup.route(GetClientConfigRoute, async ({ res, ctx }) => {
     origin: config.origin,
     userMembers: config.userMembers,
     hideScoreboardUntilEnd: config.hideScoreboardUntilEnd,
+    registrationCodeRequired: registrationCodeRequired(),
     emailEnabled: Boolean(config.email),
     globalSiteTag: config.globalSiteTag ?? null,
     registrationsEnabled: config.registrationsEnabled ?? null,

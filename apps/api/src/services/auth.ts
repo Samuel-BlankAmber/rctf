@@ -8,6 +8,7 @@ import type {
   BadKnownEmail,
   BadKnownName,
   BadRateLimit,
+  BadRegistrationCode,
   BadRegistrationsDisabled,
   GoodRegister,
   GoodRegisterV2,
@@ -25,6 +26,7 @@ import {
   rateLimitRegisterByIp,
 } from './rate-limit'
 import { createPendingRegistrationVerification } from './registration-verifications'
+import { registrationCodeAccepted } from './registration-codes'
 import {
   createUser,
   createUserV2,
@@ -34,6 +36,7 @@ import {
 
 type RegisterResponseHelpers = ResponseHelpers<
   [
+    typeof BadRegistrationCode,
     typeof BadRegistrationsDisabled,
     typeof BadEndpoint,
     typeof BadCompetitionNotAllowed,
@@ -49,6 +52,7 @@ type RegisterResponseHelpers = ResponseHelpers<
 
 type RegisterV2ResponseHelpers = ResponseHelpers<
   [
+    typeof BadRegistrationCode,
     typeof BadRegistrationsDisabled,
     typeof BadEndpoint,
     typeof BadCompetitionNotAllowed,
@@ -64,6 +68,7 @@ type RegisterV2ResponseHelpers = ResponseHelpers<
 
 type RegisterCommonResponseHelpers = ResponseHelpers<
   [
+    typeof BadRegistrationCode,
     typeof BadRegistrationsDisabled,
     typeof BadEndpoint,
     typeof BadCompetitionNotAllowed,
@@ -83,6 +88,7 @@ type RegisterUserBody = {
   email?: string
   name: string
   ctftimeToken?: string
+  registrationCode?: string
 }
 
 type UserToCreate = Pick<User, 'division' | 'email' | 'name' | 'ctftimeId'>
@@ -109,6 +115,10 @@ const prepareRegistration = async (
 ): Promise<PrepareRegistrationResult> => {
   if (!config.registrationsEnabled) {
     return { hasResult: true, response: res.badRegistrationsDisabled() }
+  }
+
+  if (!registrationCodeAccepted(body.registrationCode)) {
+    return { hasResult: true, response: res.badRegistrationCode() }
   }
 
   if (body.ctftimeToken && !config.ctftime) {

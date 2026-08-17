@@ -89,6 +89,14 @@ export const loadEnvConfig = (): ConfigLayer => {
     ['clientSecret', getEnvString('RCTF_CTFTIME_CLIENT_SECRET')],
   ])
 
+  const registrationCodesEnv = getEnvString('RCTF_REGISTRATION_CODES')
+  const registrationCodes = registrationCodesEnv
+    ? registrationCodesEnv
+        .split(',')
+        .map(code => code.trim())
+        .filter(Boolean)
+    : undefined
+
   const meta = optionalObjectFrom([
     ['description', getEnvString('RCTF_META_DESCRIPTION')],
     ['imageUrl', getEnvString('RCTF_IMAGE_URL')],
@@ -128,6 +136,7 @@ export const loadEnvConfig = (): ConfigLayer => {
     ['ctftime', ctftime],
     ['userMembers', getEnvBoolean('RCTF_USER_MEMBERS')],
     ['hideScoreboardUntilEnd', getEnvBoolean('RCTF_HIDE_SCOREBOARD_UNTIL_END')],
+    ['registrationCodes', registrationCodes],
     ['homeContent', getEnvString('RCTF_HOME_CONTENT')],
     ['ctfName', getEnvString('RCTF_NAME')],
     ['meta', meta],

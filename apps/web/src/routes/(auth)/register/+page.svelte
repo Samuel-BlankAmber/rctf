@@ -185,6 +185,29 @@
               />
             {/snippet}
           </Field>
+          {#if clientConfig.registrationCodeRequired}
+            <Field
+              label="Registration code"
+              description="The organisers will have given you this."
+              error={form.errors.registrationCode}
+            >
+              {#snippet children({ id, describedBy })}
+                <Input
+                  {id}
+                  name="registrationCode"
+                  type="text"
+                  placeholder="Enter your registration code"
+                  autocomplete="off"
+                  autocorrect="off"
+                  required
+                  aria-describedby={describedBy}
+                  aria-invalid={!!form.errors.registrationCode || undefined}
+                  bind:value={form.data.registrationCode}
+                  oninput={() => form.validateField('registrationCode')}
+                />
+              {/snippet}
+            </Field>
+          {/if}
           <Button type="submit" disabled={isPending}>
             {#if isPending}
               <Spinner />
@@ -246,6 +269,29 @@
               />
             {/snippet}
           </Field>
+          {#if clientConfig.registrationCodeRequired}
+            <Field
+              label="Registration code"
+              description="The organisers will have given you this."
+              error={form.errors.registrationCode}
+            >
+              {#snippet children({ id, describedBy })}
+                <Input
+                  {id}
+                  name="registrationCode"
+                  type="text"
+                  placeholder="Enter your registration code"
+                  autocomplete="off"
+                  autocorrect="off"
+                  required
+                  aria-describedby={describedBy}
+                  aria-invalid={!!form.errors.registrationCode || undefined}
+                  bind:value={form.data.registrationCode}
+                  oninput={() => form.validateField('registrationCode')}
+                />
+              {/snippet}
+            </Field>
+          {/if}
           <Button type="submit" disabled={isPending}>
             {#if isPending}
               <Spinner />
