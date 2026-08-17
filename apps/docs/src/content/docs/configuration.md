@@ -460,6 +460,8 @@ an invite-only event that leaks the whole challenge set, including attachments,
 to people who never registered. With this on, `<route>GET /api/v[12]/challs</route>`, the solver lists, the
 per-challenge scores, the leaderboard's challenge index (which carries every
 challenge name and category) and `/uploads/{:dir}` all require a valid token.
+Public profiles stop listing solves too, since a solve names the challenge it
+belongs to.
 
 Attachments are fetched by ordinary browser navigation, which sends no
 `Authorization{:http}` header, so the challenge list signs each file URL with a

@@ -154,3 +154,33 @@ describe('requireAuthForChallenges', () => {
     expect(res.status).not.toBe(401)
   })
 })
+
+describe('requireAuthForChallenges and profiles', () => {
+  test('a profile does not name challenges to a stranger', async () => {
+    // A solve entry carries the challenge name and category, so a public
+    // profile would list the challenge set even with the routes gated.
+    config.requireAuthForChallenges = true
+    config.hideScoreboardUntilEnd = false
+
+    const { challenge, cleanup } = await generateChallenge()
+    const solver = await generateRealTestUser()
+    await request(app, `/api/v1/challs/${challenge.id}/submit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${await generateAuthToken(solver.user.id)}`,
+      },
+      body: JSON.stringify({ flag: challenge.flag }),
+    })
+
+    const res = await request(app, `/api/v1/users/${solver.user.id}`, {
+      method: 'GET',
+    })
+    const body = await res.json()
+    const names = JSON.stringify(body)
+
+    expect(names).not.toContain(challenge.name)
+    expect(names).not.toContain(challenge.category)
+    await cleanup()
+  })
+})
