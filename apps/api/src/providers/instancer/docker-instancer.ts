@@ -2,11 +2,13 @@ import * as z from 'zod/mini'
 import {
   instanceDetailsSchema,
   instancerErrorSchema,
+  instancesListSchema,
   InstancerProvider,
   type CreateInstanceOptions,
   type ExtendInstanceOptions,
   type instanceDetailsOrError,
   type InstanceQueryOptions,
+  type InstanceSummary,
   type ProviderConfig,
 } from './base'
 import { docker, linux, net } from './util'
@@ -527,5 +529,18 @@ export default class TinyInstancerProvider extends InstancerProvider {
       rctfAuthToken: this.authToken,
       ...options,
     })
+  }
+
+  override listInstances = async (): Promise<InstanceSummary[]> => {
+    const response = await fetch(`${this.apiUrl}/v1/instances/list`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        kind: 'instancerListInstancesForm',
+        rctfAuthToken: this.authToken,
+      }),
+    })
+    const data = await response.json()
+    return instancesListSchema.parse(data).instances
   }
 }

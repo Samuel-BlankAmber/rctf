@@ -42,6 +42,22 @@ export const instancerErrorSchema = z.object({
   message: z.string(),
 })
 
+export const instanceSummarySchema = z.object({
+  teamId: z.string(),
+  challengeIntegrationId: z.string(),
+  instanceId: z.string(),
+  status: z.enum(InstanceStatus),
+  startedAt: z.nullable(z.int()),
+  expiresAt: z.nullable(z.int()),
+})
+
+export type InstanceSummary = z.output<typeof instanceSummarySchema>
+
+export const instancesListSchema = z.object({
+  kind: z.literal('instancerInstancesList'),
+  instances: z.array(instanceSummarySchema),
+})
+
 export type instanceDetailsOrError =
   | z.output<typeof instanceDetailsSchema>
   | z.output<typeof instancerErrorSchema>
@@ -97,4 +113,8 @@ export abstract class InstancerProvider extends BaseProvider {
     actionId: string,
     options: InstanceQueryOptions
   ) => Promise<instancerActionOutcome>
+
+  // Optional: list every active instance this provider manages, for admin
+  // monitoring. Providers that cannot enumerate instances omit it.
+  listInstances?: () => Promise<InstanceSummary[]>
 }

@@ -26,6 +26,7 @@ import {
   GoodAdminBotJobUpdate,
   GoodAdminBotQueueDepth,
   GoodAdminBotStatus,
+  GoodAdminActivityV2,
   GoodAdminChallengesV2,
   GoodAdminChallengeV2,
   GoodAdminExternalAuthClientCreate,
@@ -80,6 +81,15 @@ export const GetAdminChallengesRouteV2 = defineRoute({
   path: '/v2/admin/challs',
   method: 'GET',
   goodResponses: [GoodAdminChallengesV2],
+  badResponses: [BadPerms, BadToken],
+  authRequired: true,
+  permissions: Permissions.challsRead,
+})
+
+export const GetAdminActivityRouteV2 = defineRoute({
+  path: '/v2/admin/activity',
+  method: 'GET',
+  goodResponses: [GoodAdminActivityV2],
   badResponses: [BadPerms, BadToken],
   authRequired: true,
   permissions: Permissions.challsRead,

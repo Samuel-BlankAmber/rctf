@@ -7,6 +7,7 @@ import {
   GetChallengeSolvesRouteV2,
   GetChallengesRouteV2,
   GetInstanceStatusRouteV2,
+  RecordChallengeViewRouteV2,
   GoodAdminBotJobHistory,
   GoodAdminBotJobStatus,
   GoodChallengeScoresV2,
@@ -275,6 +276,23 @@ export function useAdminBotHistory(
   enabled: () => boolean
 ) {
   return createQuery(() => adminBotHistoryQueryOptions(id(), enabled()))
+}
+
+// Best-effort telemetry: tell the server this challenge was opened, so admins
+// can monitor activity. Never surfaces errors to the player.
+const recentlyRecordedViews = new Map<string, number>()
+const VIEW_RECORD_THROTTLE_MS = 30 * 1000
+
+export function recordChallengeView(challengeId: string): void {
+  const now = Date.now()
+  const last = recentlyRecordedViews.get(challengeId) ?? 0
+  if (now - last < VIEW_RECORD_THROTTLE_MS) {
+    return
+  }
+  recentlyRecordedViews.set(challengeId, now)
+  void apiRequest(RecordChallengeViewRouteV2, { id: challengeId }).catch(
+    () => {}
+  )
 }
 
 export function invalidateAfterSolve(

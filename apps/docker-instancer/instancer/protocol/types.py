@@ -153,6 +153,10 @@ class RCTFRenewInstanceForm(BaseRCTFRequest):
     timeout_milliseconds: int = Field(validation_alias='timeoutMilliseconds')
 
 
+class RCTFListInstancesForm(BaseRCTFRequest):
+    kind: Literal['instancerListInstancesForm'] = 'instancerListInstancesForm'
+
+
 class RCTFInstanceDetails(BaseModel):
     class Endpoint(BaseModel):
         kind: ExposeKind
@@ -163,6 +167,20 @@ class RCTFInstanceDetails(BaseModel):
     status: InstanceStatus
     time_left_milliseconds: int | None = Field(serialization_alias='timeLeftMilliseconds')
     endpoints: list[Endpoint] | None
+
+
+class RCTFInstanceSummary(BaseModel):
+    team_id: str = Field(serialization_alias='teamId')
+    challenge_integration_id: str = Field(serialization_alias='challengeIntegrationId')
+    instance_id: str = Field(serialization_alias='instanceId')
+    status: InstanceStatus
+    started_at: int | None = Field(serialization_alias='startedAt')
+    expires_at: int | None = Field(serialization_alias='expiresAt')
+
+
+class RCTFInstancesList(BaseModel):
+    kind: Literal['instancerInstancesList'] = 'instancerInstancesList'
+    instances: list[RCTFInstanceSummary]
 
 
 class RCTFInstancerError(BaseModel):

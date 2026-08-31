@@ -1,4 +1,5 @@
 export * from './admin-bot-jobs'
+export * from './challenge-views'
 export * from './challenges'
 export * from './dynamic-flags'
 export * from './external-auth-clients'

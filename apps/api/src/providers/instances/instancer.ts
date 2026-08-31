@@ -1,6 +1,6 @@
 import { config } from '@rctf/config'
 import { instancerProviders } from '../instancer'
-import type { InstancerProvider } from '../instancer/base'
+import type { InstanceSummary, InstancerProvider } from '../instancer/base'
 import { resolveInstancerConfigs } from '../instancer/resolve'
 import { loadProvider } from './load'
 
@@ -13,3 +13,22 @@ export const instancers: Record<string, InstancerProvider> = Object.fromEntries(
 )
 export const defaultInstancerName = resolvedInstancers.defaultName
 export const instancerEnabled = Object.keys(instancers).length > 0
+
+// Every active instance across providers that can enumerate them, for admin
+// monitoring. Providers without listInstances contribute nothing; a failing
+// provider is skipped rather than failing the whole request.
+export const getActiveInstances = async (): Promise<InstanceSummary[]> => {
+  const perProvider = await Promise.all(
+    Object.values(instancers).map(async provider => {
+      if (!provider.listInstances) {
+        return []
+      }
+      try {
+        return await provider.listInstances()
+      } catch {
+        return []
+      }
+    })
+  )
+  return perProvider.flat()
+}

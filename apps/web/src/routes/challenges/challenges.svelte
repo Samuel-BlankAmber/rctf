@@ -7,6 +7,7 @@
     deriveBloodIds,
     deriveSolvedIds,
     invalidateAfterSolve,
+    recordChallengeView,
     useChallenges,
   } from '$lib/query/challenges'
   import { useCurrentUser } from '$lib/query/user'
@@ -63,6 +64,14 @@
 
   const isMobile = $derived(innerWidth > 0 && innerWidth < DESKTOP_MIN_WIDTH)
   const listMinSize = $derived(innerWidth < WIDE_MIN_WIDTH ? 40 : 20)
+
+  // Tell the server which challenge the player has opened (throttled, best
+  // effort) so admins can monitor activity. Fires for clicks and deep links.
+  $effect(() => {
+    if (selectedId) {
+      recordChallengeView(selectedId)
+    }
+  })
 
   const selectedChallenge = $derived(
     selectedId ? (challenges.find(c => c.id === selectedId) ?? null) : null

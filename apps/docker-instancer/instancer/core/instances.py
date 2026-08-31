@@ -287,6 +287,45 @@ async def get_instance(challenge_name: str, team_id: str) -> protocol.RCTFInstan
     )
 
 
+async def list_instances() -> list[protocol.RCTFInstanceSummary]:
+    """Every running managed instance, grouped by instance id, for admin monitoring."""
+    docker = get_docker()
+    try:
+        containers = await docker.containers.list(
+            all=False,
+            filters={'label': [f'{ContainerLabels.MANAGED_BY}={config.DOCKER_MANAGER_NAME}']},
+        )
+    except DockerError as err:
+        logger.opt(exception=err).error('Error listing instances')
+        return []
+
+    details = await _show_containers(containers)
+    groups: dict[str, list[dict]] = {}
+    for detail in details:
+        labels = detail['Config']['Labels']
+        instance_id = labels.get(ContainerLabels.INSTANCE_ID)
+        if instance_id:
+            groups.setdefault(instance_id, []).append(detail)
+
+    summaries: list[protocol.RCTFInstanceSummary] = []
+    for instance_id, group in groups.items():
+        first_labels = group[0]['Config']['Labels']
+        expires_at = await get_effective_expiration(first_labels)
+        started_at_raw = first_labels.get(ContainerLabels.STARTED_AT)
+        statuses = [_get_container_status(detail) for detail in group]
+        summaries.append(
+            protocol.RCTFInstanceSummary(
+                team_id=first_labels.get(ContainerLabels.TEAM_ID, ''),
+                challenge_integration_id=first_labels.get(ContainerLabels.CHALLENGE, ''),
+                instance_id=instance_id,
+                status=_get_highest_status(statuses),
+                started_at=int(started_at_raw) if started_at_raw else None,
+                expires_at=expires_at,
+            )
+        )
+    return summaries
+
+
 async def renew_instance(form: protocol.RCTFRenewInstanceForm) -> protocol.RCTFInstanceDetails:
     async with instance_lock(form.challenge_integration_id, form.team_id) as acquired:
         if not acquired:

@@ -10,6 +10,7 @@ import {
   BadToken,
   GoodChallengeScoresV2,
   GoodChallengeSolvesV2,
+  GoodChallengeView,
   GoodChallengesV2,
   GoodDynamicScores,
 } from '../../responses'
@@ -86,6 +87,21 @@ export const GetChallengeScoresRouteV2 = defineRoute({
       .pipe(z.coerce.number(), z.int())
       .check(z.gte(0))
       .check(z.describe('Integer `>= 0`.')),
+  }),
+  onlyWhenStarted: true,
+  onlyWhenStartedPermissionsBypass: Permissions.challsRead,
+})
+
+// Records that the authenticated player opened this challenge's description, for
+// admin activity monitoring. Best-effort telemetry: it never blocks the player.
+export const RecordChallengeViewRouteV2 = defineRoute({
+  path: '/v2/challs/:id/view',
+  method: 'POST',
+  goodResponses: [GoodChallengeView],
+  badResponses: [BadNotStarted, BadChallenge, BadToken],
+  authRequired: true,
+  params: z.object({
+    id: z.string().check(z.describe('Challenge ID.')),
   }),
   onlyWhenStarted: true,
   onlyWhenStartedPermissionsBypass: Permissions.challsRead,

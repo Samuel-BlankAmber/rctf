@@ -32,3 +32,9 @@ async def stop_instance(form: types.RCTFDeleteInstanceForm) -> types.RCTFInstanc
 async def renew_instance(form: types.RCTFRenewInstanceForm) -> types.RCTFInstanceDetails:
     form.check_token()
     return await instances.renew_instance(form)
+
+
+@router.post('/list')
+async def list_instances(form: types.RCTFListInstancesForm) -> types.RCTFInstancesList:
+    form.check_token()
+    return types.RCTFInstancesList(instances=await instances.list_instances())
