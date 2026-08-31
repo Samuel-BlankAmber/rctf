@@ -453,6 +453,13 @@ export const UpdateChallengeRouteV2 = defineRoute({
             'Scheduled release time as a Unix ms timestamp, or `null`.'
           )
         ),
+        requires: example(z.optional(z.nullable(z.array(z.string()))), [
+          'welcome',
+        ]).check(
+          z.describe(
+            'Challenge ids that must all be solved before this challenge unlocks; empty or `null` for none.'
+          )
+        ),
         scoring: z
           .optional(ChallengeScoringSchema)
           .check(z.describe('Scoring algorithm configuration.')),

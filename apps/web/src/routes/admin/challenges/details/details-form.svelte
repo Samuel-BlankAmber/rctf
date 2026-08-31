@@ -15,7 +15,7 @@
     IconTrash,
     IconTrophy,
   } from '$lib/icons'
-  import { useFlagProviders } from '$lib/query/admin'
+  import { useAdminChallenges, useFlagProviders } from '$lib/query/admin'
   import { useClientConfig } from '$lib/query/config'
   import Button from '$lib/ui/button.svelte'
   import Input from '$lib/ui/input.svelte'
@@ -92,6 +92,19 @@
   const clientConfigQuery = useClientConfig()
   const flagPlaceholder = $derived(
     clientConfigQuery.data?.flagFormatPlaceholder ?? 'flag{...}'
+  )
+
+  // Challenges that may be used as prerequisites: every challenge except this
+  // one (a challenge cannot require itself).
+  const adminChallengesQuery = useAdminChallenges()
+  const prerequisiteChallenges = $derived(
+    (adminChallengesQuery.data ?? []).filter(c => c.id !== challengeId)
+  )
+  const prerequisiteIds = $derived(
+    new Set(prerequisiteChallenges.map(c => c.id))
+  )
+  const prerequisiteName = $derived(
+    new Map(prerequisiteChallenges.map(c => [c.id, c.name]))
   )
 
   const flagProvidersQuery = useFlagProviders()
@@ -382,6 +395,31 @@
                       !tag.includes(',') && !form.tags.includes(tag)}
                     onchange={tags => onFieldChange('tags', tags)}
                   />
+                </form-field>
+
+                <form-field>
+                  <field-label>
+                    Prerequisites
+                    <field-hint>
+                      (challenge ids that must be solved to unlock this one)
+                    </field-hint>
+                  </field-label>
+                  <TagInput
+                    value={form.requires}
+                    {disabled}
+                    aria-label="Add prerequisite challenge id"
+                    emptyPlaceholder="welcome, baby-xor..."
+                    validate={id =>
+                      prerequisiteIds.has(id) && !form.requires.includes(id)}
+                    onchange={requires => onFieldChange('requires', requires)}
+                  />
+                  {#if form.requires.length > 0}
+                    <field-hint>
+                      Unlocks after solving: {form.requires
+                        .map(id => prerequisiteName.get(id) ?? id)
+                        .join(', ')}
+                    </field-hint>
+                  {/if}
                 </form-field>
 
                 <form-field

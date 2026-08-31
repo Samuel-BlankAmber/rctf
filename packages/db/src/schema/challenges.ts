@@ -78,6 +78,9 @@ export interface ChallengeData {
   tiebreakEligible: boolean
   sortWeight?: number
   tags?: string[]
+  // Challenge ids that must all be solved before this challenge is shown to a
+  // player or accepts their flag. Empty/absent means no prerequisites.
+  requires?: string[] | null
   instancerConfig?: InstancerConfig
   adminBotConfig?: AdminBotConfig
   hidden?: boolean

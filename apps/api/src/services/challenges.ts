@@ -182,6 +182,33 @@ export const isChallengePublic = (challenge: Challenge): boolean => {
   return +new Date() >= (challenge.data.releaseTime ?? 0)
 }
 
+const NO_SOLVES: ReadonlySet<string> = new Set()
+
+// Challenge ids the user has solved by flag, used to evaluate prerequisites.
+export const getSolvedChallengeIds = async (
+  db: DatabaseClient,
+  userId: string
+): Promise<Set<string>> => {
+  const rows = await db
+    .selectDistinct({ challengeId: solves.challengeid })
+    .from(solves)
+    .where(and(eq(solves.userid, userId), eq(solves.source, 'flag')))
+  return new Set(rows.map(row => row.challengeId))
+}
+
+// A challenge unlocks once every id in `requires` has been solved. Absent or
+// empty `requires` means the challenge is always unlocked.
+export const prerequisitesMet = (
+  data: Pick<ChallengeData, 'requires'>,
+  solvedIds: ReadonlySet<string>
+): boolean => {
+  const requires = data.requires
+  if (!requires || requires.length === 0) {
+    return true
+  }
+  return requires.every(id => solvedIds.has(id))
+}
+
 const challengeDefaultOrder = [
   sql`((${challenges.data} ->> 'sortWeight')::int) NULLS LAST`,
   desc(challenges.id),
@@ -229,23 +256,35 @@ export const getChallenges = async (
   userId?: string
 ): Promise<ChallengeWithMyScore[]> => {
   if (!userId) {
-    return await preparedPublicChallenges(db).execute()
+    const rows = await preparedPublicChallenges(db).execute()
+    // With no user there are no solves, so only prerequisite-free challenges
+    // are visible.
+    return rows.filter(row => prerequisitesMet(row.data, NO_SOLVES))
   }
 
-  const [rows, dynamicScoresByUser] = await Promise.all([
+  const [rows, dynamicScoresByUser, solvedIds] = await Promise.all([
     preparedPublicChallengesWithMyScore(db).execute({ userId }),
     getDynamicScoresForUsers(db, [userId]),
+    getSolvedChallengeIds(db, userId),
   ])
 
   const deltaByChallenge = new Map(
     (dynamicScoresByUser.get(userId) ?? []).map(s => [s.id, s.pointDelta])
   )
 
-  return rows.map(({ myScore, ...rest }) => ({
-    ...rest,
-    myScore: myScore ?? undefined,
-    myPointDelta: deltaByChallenge.get(rest.id),
-  }))
+  return (
+    rows
+      // A challenge the user has already solved always stays on their board,
+      // even if its prerequisites were added afterwards.
+      .filter(
+        row => solvedIds.has(row.id) || prerequisitesMet(row.data, solvedIds)
+      )
+      .map(({ myScore, ...rest }) => ({
+        ...rest,
+        myScore: myScore ?? undefined,
+        myPointDelta: deltaByChallenge.get(rest.id),
+      }))
+  )
 }
 
 export const getChallenge = async (
@@ -1146,6 +1185,15 @@ export const submitFlag = async (
   const flagEntries = challenge?.data.flags ?? []
   if (!challenge || flagEntries.length === 0) {
     return res.badChallenge()
+  }
+
+  // A locked challenge behaves as if it does not exist: don't accept its flag
+  // until every prerequisite has been solved.
+  if (challenge.data.requires?.length) {
+    const solvedIds = await getSolvedChallengeIds(db, params.userId)
+    if (!prerequisitesMet(challenge.data, solvedIds)) {
+      return res.badChallenge()
+    }
   }
 
   if (scoringKindOf(challenge.data) !== ChallengeScoringKind.DECAY) {

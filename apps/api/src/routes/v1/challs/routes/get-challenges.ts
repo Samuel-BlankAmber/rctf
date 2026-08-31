@@ -11,7 +11,7 @@ challsGroup.route(GetChallengesRoute, async ({ res, ctx, user }) => {
     return res.badToken()
   }
 
-  const challenges = await getChallenges(ctx.var.db)
+  const challenges = await getChallenges(ctx.var.db, user?.id)
 
   return res.goodChallenges(
     await Promise.all(

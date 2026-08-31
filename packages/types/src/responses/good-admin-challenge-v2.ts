@@ -36,6 +36,11 @@ export const AdminChallengeSchemaV2 = z.object({
   tags: example(z.nullish(z.array(z.string())), ['beginner']).check(
     z.describe('Challenge tags, or `null` when unset.')
   ),
+  requires: example(z.nullish(z.array(z.string())), ['welcome']).check(
+    z.describe(
+      'Challenge ids that must all be solved before this challenge unlocks, or `null` when unset.'
+    )
+  ),
   instancerConfig: z
     .nullish(InstancerConfigSchema)
     .check(

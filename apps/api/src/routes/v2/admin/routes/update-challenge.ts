@@ -41,6 +41,13 @@ adminGroup.route(UpdateChallengeRouteV2, async ({ res, ctx, params, body }) => {
     delete body.data.flag
   }
 
+  // A challenge cannot be its own prerequisite (it could never unlock).
+  if (body.data.requires?.includes(params.id)) {
+    return res.badBody({
+      reason: 'requires cannot include the challenge itself',
+    })
+  }
+
   // Validate flag entries against their provider config schemas if provided
   if (body.data.flags) {
     for (const [i, entry] of body.data.flags.entries()) {
@@ -157,5 +164,6 @@ adminGroup.route(UpdateChallengeRouteV2, async ({ res, ctx, params, body }) => {
       size: file.size ?? null,
     })),
     hidden: updated.data.hidden ?? false,
+    requires: updated.data.requires ?? null,
   })
 })

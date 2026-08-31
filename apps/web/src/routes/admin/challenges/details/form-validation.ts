@@ -95,6 +95,7 @@ export function buildSavePayload(
       tiebreakEligible: form.tiebreakEligible,
       sortWeight: form.sortWeight || undefined,
       tags: form.tags,
+      requires: form.requires,
       files: form.files,
       instancerConfig: form.instancerConfig,
       adminBotConfig: form.adminBotConfig.enabled
