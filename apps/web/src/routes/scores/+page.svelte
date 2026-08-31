@@ -5,6 +5,7 @@
   import EmptyState from '$lib/ui/empty-state.svelte'
   import Spinner from '$lib/ui/spinner.svelte'
   import ScoresLeaderboard from './leaderboard/leaderboard.svelte'
+  import ScoresSolveCounts from './solve-counts.svelte'
   import { createScoresData } from './model/data.svelte'
   import { createScoresRouteState } from './model/url-state.svelte'
   import ScoresScreenshotContainer from './screenshot/screenshot-container.svelte'
@@ -53,13 +54,7 @@
 {#if data.isNotStarted}
   <CtfNotStarted />
 {:else if scoreboardHidden}
-  <scores-hidden>
-    <EmptyState
-      icon={IconTrophy}
-      title="Scores are hidden"
-      subtitle="Standings are revealed when the competition ends."
-    />
-  </scores-hidden>
+  <ScoresSolveCounts />
 {:else}
   <scores-page>
     <ScoresToolbar
@@ -123,14 +118,6 @@
 {/if}
 
 <style>
-  scores-hidden {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-s);
-  }
-
   scores-page {
     display: flex;
     flex: 1;
