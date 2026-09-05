@@ -100,11 +100,31 @@ const separateHtmlBlocks = (markdown: string): string => {
   return parts.join('')
 }
 
+// Allow YouTube video embeds in rendered markdown (e.g. challenge
+// descriptions). DOMPurify drops <iframe> by default; we re-allow the tag but
+// keep only iframes whose src is a YouTube embed URL, dropping any other. The
+// deployment CSP's frame-src is already scoped to YouTube, so that is the only
+// origin that can be framed even if the tag survives.
+const YOUTUBE_EMBED_SRC =
+  /^https:\/\/(?:www\.)?(?:youtube\.com|youtube-nocookie\.com)\/embed\/[\w-]+(?:\?[\w=&%.-]*)?$/
+
+const SANITIZE_OPTIONS = {
+  ADD_TAGS: ['iframe'],
+  ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'referrerpolicy'],
+}
+
 let purify: ReturnType<typeof DOMPurify> | undefined
 
 const getPurify = () => {
   if (purify) return purify
   purify = DOMPurify(window)
+  purify.addHook('uponSanitizeElement', (node, data) => {
+    if (data.tagName !== 'iframe') return
+    const element = node as Element
+    if (!YOUTUBE_EMBED_SRC.test(element.getAttribute('src') ?? '')) {
+      element.parentNode?.removeChild(element)
+    }
+  })
   purify.addHook('afterSanitizeAttributes', node => {
     const emittedByExtension = node.getAttribute('data-nonce') === nonce
     node.removeAttribute('data-nonce')
@@ -118,7 +138,7 @@ const marked = new Marked({
   extensions: [alert, timer],
   hooks: {
     preprocess: separateHtmlBlocks,
-    postprocess: html => getPurify().sanitize(html),
+    postprocess: html => getPurify().sanitize(html, SANITIZE_OPTIONS),
   },
 })
 
