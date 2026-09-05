@@ -2,3 +2,10 @@ tls:
   certificates:
     - certFile: '/certs/fullchain.pem'
       keyFile: '/certs/privkey.pem'
+  options:
+    # Advertise only HTTP/1.1 in ALPN. tcp-ssl routers forward raw bytes to the
+    # backend with no HTTP translation, so a browser negotiating h2 would speak
+    # HTTP/2 to an HTTP/1.1 backend and fail. Referenced only by tcp-ssl routers.
+    http1only:
+      alpnProtocols:
+        - http/1.1

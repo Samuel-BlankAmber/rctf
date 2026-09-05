@@ -87,6 +87,10 @@ def expose_ports(
                 labels[f'traefik.tcp.routers.{router_name}.entrypoints'] = config.TRAEFIK_TCP_ENTRYPOINT
                 labels[f'traefik.tcp.routers.{router_name}.service'] = router_name
                 labels[f'traefik.tcp.routers.{router_name}.tls'] = 'true'
+                # Only HTTP/1.1 in ALPN: tcp-ssl forwards raw bytes with no HTTP
+                # translation, so a browser negotiating h2 would break against an
+                # HTTP/1.1 backend. Scoped to tcp-ssl routers only.
+                labels[f'traefik.tcp.routers.{router_name}.tls.options'] = 'http1only@file'
                 labels[f'traefik.tcp.services.{router_name}.loadbalancer.server.port'] = str(expose.container_port)
 
             case protocol.ExposeKind.HTTP:
